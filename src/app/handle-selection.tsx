@@ -50,7 +50,7 @@ export default function HandleSelection({ selectDid }: Params) {
 					<h1 className="text-2xl font-bold">
 						free <span className="bg-clip-text text-transparent bg-gradient-to-r from-blue-500 to-blue-600">*.warga.cloud</span> handle
 					</h1>
-					<p className="text-sm">Tired of your default Bluesky handle? Claim your swag handle now, warga sekalian!</p>
+					<p className="text-sm">Tired of your default Bluesky handle? Claim your swag identity now, warga sekalian!</p>
 				</div>
 
 				<div>
@@ -77,7 +77,7 @@ export default function HandleSelection({ selectDid }: Params) {
 										}
 									}
 								}}>
-									Check handle
+									Check
 								</Button>
 							</div>
 						</div>
@@ -109,7 +109,7 @@ export default function HandleSelection({ selectDid }: Params) {
 											setAlert({ type: "red", message: "Oops, handle was already taken" })
 										}
 									}
-								}}>Check handle</Button>
+								}}>Check</Button>
 						</div>
 					</Card>
 
