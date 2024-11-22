@@ -44,8 +44,8 @@ export default function HandleSelection({ selectDid }: Params) {
 	const disabledState = selectedHandle.did === "" || loading || selectedHandle.handleClaimed;
 
 	return (
-		<main className="flex min-h-screen flex-col items-center px-4 py-8 sm:p-20">
-			<div className="flex flex-col gap-8">
+		<main className="flex min-h-screen flex-col items-center px-4 py-8 sm:p-20 ">
+			<div className="flex flex-col gap-8 max-w-lg">
 				<div>
 					<h1 className="text-2xl font-bold">
 						free <span className="bg-clip-text text-transparent bg-gradient-to-r from-blue-500 to-blue-600">*.warga.cloud</span> handle
@@ -125,13 +125,14 @@ export default function HandleSelection({ selectDid }: Params) {
 											...selectedHandle,
 											handleClaimed: true
 										})
+										setAlert(null);
 									} catch (error) {
+										setAlert({ type: "red", message: "Oops, cannot book your handle. It might be already taken or contains reserved words" });
 										selectHandle({
 											...selectedHandle,
 											handleClaimed: false
 										})
 									} finally {
-										setAlert(null);
 										setLoading(false);
 									}
 								}
