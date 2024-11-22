@@ -10,8 +10,8 @@ type Params = {
 }
 
 const colorVariants: Record<string, string> = {
-	green: 'text-green-500 border-green-500 bg-green-50',
-	red: 'text-red-500 border-red-500 bg-red-50',
+	green: "text-green-500 border-green-500 bg-green-50",
+	red: "text-red-500 border-red-500 bg-red-50",
 };
 
 
@@ -19,24 +19,21 @@ export default function HandleSelection({ selectDid }: Params) {
 	const currentHandleRef = useRef<HTMLInputElement>(null);
 	const newHandleRef = useRef<HTMLInputElement>(null);
 	const [selectedHandle, selectHandle] = useState({
-		did: '',
-		currentHandle: '',
-		newHandle: '',
+		did: "",
+		currentHandle: "",
+		newHandle: "",
 		handleClaimed: false,
 	});
 	const [alert, setAlert] = useState<{ type: string, message: string } | null>(null);
 	const [loading, setLoading] = useState(false);
 
-	const checkDid = async (handle: string, errorMessage?: string): Promise<null | string> => {
+	const checkDid = async (handle: string): Promise<null | string> => {
 		if (handle.length === 0) return null;
 		setLoading(true);
 		setAlert(null);
 		const req = await fetch(`https://bsky.social/xrpc/com.atproto.identity.resolveHandle?handle=${handle}`)
 		if (!req.ok) {
 			setLoading(false);
-			if (errorMessage) {
-				setAlert({ type: 'red', message: errorMessage });
-			}
 			return null;
 		}
 		const res = await req.json() as { did: string }
@@ -55,7 +52,7 @@ export default function HandleSelection({ selectDid }: Params) {
 
 				<div>
 					{alert && (
-						<p className={`${colorVariants[alert.type]} border px-2 py-1 rounded mb-4`}>{alert.message}</p>
+						<p className={`${colorVariants[alert.type]} text-sm border px-2 py-1 rounded mb-4`}>{alert.message}</p>
 					)}
 
 					{/* STEP 1: Check current handle */}
@@ -67,11 +64,13 @@ export default function HandleSelection({ selectDid }: Params) {
 								<Input ref={currentHandleRef} placeholder="*.bsky.social" disabled={selectedHandle.did !== ""} />
 								<Button disabled={loading || selectedHandle.did !== ""} onClick={async () => {
 									if (currentHandleRef.current) {
-										const did = await checkDid(currentHandleRef.current.value, "Handle tidak ditemukan")
+										const did = await checkDid(currentHandleRef.current.value)
 										if (did !== null) {
 											selectHandle({ ...selectedHandle, currentHandle: currentHandleRef.current.value, did: did });
+											setAlert({ type: "green", message: "Handle valid. Sekarang pilih handle wargamu" })
 										} else {
-											selectHandle({ ...selectedHandle, currentHandle: '', did: '' });
+											selectHandle({ ...selectedHandle, currentHandle: "", did: "" });
+											setAlert({ type: "red", message: "Oops, handle tidak ditemukan" });
 										}
 									}
 								}}>
@@ -91,17 +90,20 @@ export default function HandleSelection({ selectDid }: Params) {
 							<Button disabled={disableNewDidSelection}
 								onClick={async () => {
 									if (newHandleRef.current) {
-										const did = await checkDid(newHandleRef.current.value)
+										const did = await checkDid(`${newHandleRef.current.value}.warga.cloud`)
+										console.log(did)
 										if (did === null) {
 											selectHandle({
 												...selectedHandle,
 												newHandle: newHandleRef.current.value,
 											})
+											setAlert({ type: "green", message: "Handle warga tersedia" })
 										} else {
 											selectHandle({
 												...selectedHandle,
-												newHandle: '',
+												newHandle: "",
 											})
+											setAlert({ type: "red", message: "Oops, handle telah terpakai" })
 										}
 									}
 								}}>Cek ketersediaan</Button>
@@ -112,6 +114,7 @@ export default function HandleSelection({ selectDid }: Params) {
 						if (selectedHandle.did !== "" && newHandleRef.current) {
 							try {
 								setLoading(true);
+								setAlert(null);
 								await selectDid(selectedHandle.did, newHandleRef.current.value);
 								selectHandle({
 									...selectedHandle,
