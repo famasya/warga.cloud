@@ -3,14 +3,8 @@
 import { db } from "@/db";
 import HandleSelection from "./handle-selection";
 
-async function selectDid(did: string, handle: string) {
+async function claimHandle(did: string, handle: string) {
   "use server";
-
-  const banlist = process.env.BAN_LIST || "";
-
-  if (banlist.includes(handle)) {
-    throw new Error("Handle is banned");
-  }
 
   const stripedHandle = handle.replaceAll(/[^a-zA-Z0-9-]/g, "")
   const query = await db.execute({
@@ -36,6 +30,21 @@ async function selectDid(did: string, handle: string) {
   return { did, handle: stripedHandle }
 }
 
+async function checkHandle(handle: string) {
+  "use server";
+  const banlist = process.env.BAN_LIST || "";
+
+  if (banlist.includes(handle)) {
+    throw new Error("Ups, handle ini sudah terdaftar untuk sistem :(");
+  }
+
+  const req = await fetch(`https://bsky.social/xrpc/com.atproto.identity.resolveHandle?handle=${handle}`)
+  if (!req.ok) {
+    return true
+  }
+  throw new Error("Ups, handle ini sudah diambil");
+}
+
 export default async function Home() {
-  return <HandleSelection selectDid={selectDid} />
+  return <HandleSelection claimHandle={claimHandle} checkHandle={checkHandle} />
 }

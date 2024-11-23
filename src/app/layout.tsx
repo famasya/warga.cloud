@@ -9,8 +9,8 @@ const geistSans = localFont({
 });
 
 export const metadata: Metadata = {
-	title: "warga.cloud - free bluesky handle",
-	description: "free bluesky handle warga.cloud",
+	title: "free *.warga.cloud handle",
+	description: "handle gratis buat warga bluesky sekalian",
 };
 
 export default function RootLayout({
